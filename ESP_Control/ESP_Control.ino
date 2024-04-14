@@ -5,6 +5,7 @@ TFMPlus tfmP;         // Create a TFMini Plus object
 #include <Wire.h>              // libreria para bus I2C
 #include <Adafruit_GFX.h>      // libreria para pantallas graficas
 #include <Adafruit_SSD1306.h>  // libreria para controlador SSD1306
+#include "InterrupcionTimer0.h"
 
 //Inputs
 
@@ -21,29 +22,7 @@ int16_t tfFlux = 0;    // Strength or quality of return signal
 int16_t tfTemp = 0;    // Internal temperature of Lidar sensor chip
 
 //--------------------------------------------------------------------------------
-//Interrupcion Timer0
-hw_timer_t *Timer0_Cfg = NULL;
 
-#define INTERVALO_LED 250
-volatile int ContEstadoLed = 0;
-
-void IRAM_ATTR Timer0_ISR(){ 
-  if(ContEstadoLed >= INTERVALO_LED){
-    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    ContEstadoLed = 0;
-  }
-  else{
-    ContEstadoLed++;
-  }  
-}//End void IRAM_ATTR Timer0_ISR()
-
-void initTimer0(void){
-  pinMode(LED_BUILTIN, OUTPUT);
-  Timer0_Cfg = timerBegin(0, 80, true);
-  timerAttachInterrupt(Timer0_Cfg, &Timer0_ISR, true);
-  timerAlarmWrite(Timer0_Cfg, 1000, true);
-  timerAlarmEnable(Timer0_Cfg);
-}//End void initTimer0(void)
 //--------------------------------------------------------------------------------
 // Función para convertir una cadena serializada en un array de strings
 void recibirDatosUART2(String datosSerializados, String datos[]) {
@@ -125,7 +104,7 @@ void DatosEquipo(void) {
 void setup()
 {
   Serial.begin(115200);
-  initTimer0();
+  initTimer0(LED_BUILTIN);
   Serial2.begin(9600);
   delay(20);
 
