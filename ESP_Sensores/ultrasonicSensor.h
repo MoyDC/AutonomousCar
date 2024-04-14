@@ -1,4 +1,4 @@
-
+//Class for ultrasonic sensors
 class UltrasonicSensor {
   private:
     int triggerPin;
