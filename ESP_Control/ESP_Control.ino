@@ -154,7 +154,7 @@ void loop()
 
   DatosEquipo();
   // Esperar un momento
-  //delay(100);
+  delay(100);
 
   //dsvdsvsvsds
 }
