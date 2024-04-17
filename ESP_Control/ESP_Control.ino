@@ -7,6 +7,7 @@
 #include <ESP32Servo.h>
 #include "InterrupcionTimer0.h"
 #include "Pines.h"
+#include "DatosUart2.h"
 
 //Variables 
 #define NUM_ELEMENTOS 5
@@ -18,16 +19,7 @@ int16_t tfTemp = 0;    // Internal temperature of Lidar sensor chip
 //--------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------
-// Función para convertir una cadena serializada en un array de strings
-void recibirDatosUART2(String datosSerializados, String datos[]) {
-  // Extraemos los elementos de la cadena serializada y los almacenamos en el array
-  int i = 0;
-  char* ptr = strtok((char*)datosSerializados.c_str(), ",");
-  while (ptr != NULL && i < NUM_ELEMENTOS) {
-    datos[i++] = String(ptr);
-    ptr = strtok(NULL, ",");
-  }
-}//End void recibirDatosUART2(String datosSerializados, String datos[])
+
 //--------------------------------------------------------------------------------
 //Funcion para iniciar el sensor lidar
 TFMPlus tfmP;  // Create a TFMini Plus object
@@ -129,7 +121,7 @@ void loop()
   // Leer la cadena serializada
   String datosSerializados = Serial2.readStringUntil('\n');
   //Obtener los datos
-  recibirDatosUART2(datosSerializados, datos);
+  recibirDatosUART2(datosSerializados, datos, NUM_ELEMENTOS);
 
   // Imprimir los datos
   Serial.println("Lidar: " + String(tfDist) + "cm, " + "UltraS1: " + datos[0] + "cm, " + "UltraS2: " + datos[1] + "cm, " + "UltraS3: " + datos[2] + "cm, " + "UltraS4: " + datos[3] + "cm, " + "UltraS5: " + datos[4] + "cm");
