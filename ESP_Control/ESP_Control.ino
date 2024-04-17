@@ -5,14 +5,9 @@ TFMPlus tfmP;         // Create a TFMini Plus object
 #include <Wire.h>              // libreria para bus I2C
 #include <Adafruit_GFX.h>      // libreria para pantallas graficas
 #include <Adafruit_SSD1306.h>  // libreria para controlador SSD1306
+#include <ESP32Servo.h>
 #include "InterrupcionTimer0.h"
-
-//Inputs
-
-//OutPuts
-#define LED_BUILTIN 2
-#define RX_LidarSensor 23
-#define TX_LidarSensor 19
+#include "Pines.h"
 
 //Variables 
 #define NUM_ELEMENTOS 5
@@ -100,6 +95,10 @@ void DatosEquipo(void) {
   oled.display();  // muestra en pantalla todo lo establecido anteriormente
 }  //Fin DatosEquipo(void)
 //--------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 void setup()
 {
@@ -107,6 +106,9 @@ void setup()
   initTimer0(LED_BUILTIN);
   Serial2.begin(9600);
   delay(20);
+
+  ServoVolante.attach(pinServoVolante);
+  ServoVolante.write(50);
 
   Wire.begin(); // inicializa bus I2C
   Serial.println("OLED Init");
@@ -117,6 +119,9 @@ void setup()
   mySerial_LidarSensor.begin(115200); // Inicializa el puerto UART
   initSensorLidar();
   
+  pinMode(ENA, OUTPUT);
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
 }
 void loop()
 {
@@ -134,8 +139,35 @@ void loop()
   DatosEquipo();
   // Esperar un momento
   //delay(100);
-
+  ServoVolante.write(25);    // Mover el servo a 0 grados
+  delay(1000);         // Esperar 1 segundo
+  ServoVolante.write(50);   // Mover el servo a 90 grados
+  delay(1000);         // Esperar 1 segundo
+  ServoVolante.write(75);  // Mover el servo a 180 grados
+  delay(1000);
+  ServoVolante.write(50);   // Mover el servo a 90 grados
+  delay(1000);         // Esperar 1 segundo
   //dsvdsvsvsds
+
+
+  // Gira hacia adelante durante 2 segundos
+  Serial.println("Girando hacia adelante");
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(ENA, HIGH);
+  delay(5000);
+
+  // Gira hacia atrás durante 2 segundos
+  Serial.println("Girando hacia atrás");
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(ENA, HIGH);
+  delay(5000);
+
+  // Se detiene durante 2 segundos
+  Serial.println("Deteniendo motor");
+  digitalWrite(ENA, LOW);
+  delay(1000);
 }
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
