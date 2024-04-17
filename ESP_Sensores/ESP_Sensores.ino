@@ -1,20 +1,12 @@
 //ESP para leer los sensores
 #include "ultrasonicSensor.h" //Libreria para los sensores ultrasonicos
+#include "Pines.h"
 
-//Inputs
 
-//OutPuts
-#define LED_BUILTIN 2
-#define ECHO1       32
-#define TRIG1       33
-#define ECHO2       25
-#define TRIG2       26
-#define ECHO3       23
-#define TRIG3       22
-#define ECHO4       27
-#define TRIG4       14
-#define ECHO5       12
-#define TRIG5       13
+
+
+
+
 
 //Variables 
 const int numSensors = 5; // Define la cantidad de sensores que deseas crear
@@ -83,12 +75,8 @@ void loop()
   datos[3] = String(sensors[3].readDistance()); //cm
   datos[4] = String(sensors[4].readDistance()); //cm
 
+  //Se envian los datos por UART
   enviarDatosUART2(datos);
-
-  //delay(100);
-
-
-  //assvds 
 }//End loop
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
