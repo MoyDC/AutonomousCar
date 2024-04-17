@@ -1,41 +1,14 @@
 //ESP para leer los sensores
 #include "ultrasonicSensor.h" //Libreria para los sensores ultrasonicos
 #include "Pines.h"
-
-
-
-
-
-
+#include "InterrupcionTimer0.h"
 
 //Variables 
 const int numSensors = 5; // Define la cantidad de sensores que deseas crear
 UltrasonicSensor sensors[numSensors]; // Declara un array de objetos UltrasonicSensor
 
 //--------------------------------------------------------------------------------
-//Interrupcion Timer0
-hw_timer_t *Timer0_Cfg = NULL;
 
-#define INTERVALO_LED 250
-volatile int ContEstadoLed = 0;
-
-void IRAM_ATTR Timer0_ISR(){ 
-  if(ContEstadoLed >= INTERVALO_LED){
-    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    ContEstadoLed = 0;
-  }
-  else{
-    ContEstadoLed++;
-  }  
-}//End void IRAM_ATTR Timer0_ISR()
-
-void initTimer0(void){
-  pinMode(LED_BUILTIN, OUTPUT);
-  Timer0_Cfg = timerBegin(0, 80, true);
-  timerAttachInterrupt(Timer0_Cfg, &Timer0_ISR, true);
-  timerAlarmWrite(Timer0_Cfg, 1000, true);
-  timerAlarmEnable(Timer0_Cfg);
-}//End void initTimer0(void)
 //--------------------------------------------------------------------------------
 // Función para serializar datos en un array de strings y enviarlos por Serial2
 void enviarDatosUART2(String datos[]) {
@@ -54,7 +27,7 @@ void enviarDatosUART2(String datos[]) {
 void setup()
 {
   Serial.begin(115200);
-  initTimer0();
+  initTimer0(LED_BUILTIN);
   Serial2.begin(9600);
 
   // Inicializa cada objeto UltrasonicSensor con los pines correspondientes
