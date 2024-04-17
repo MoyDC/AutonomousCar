@@ -2,26 +2,12 @@
 #include "ultrasonicSensor.h" //Libreria para los sensores ultrasonicos
 #include "Pines.h"
 #include "InterrupcionTimer0.h"
+#include "DatosUart2.h"
 
 //Variables 
 const int numSensors = 5; // Define la cantidad de sensores que deseas crear
 UltrasonicSensor sensors[numSensors]; // Declara un array de objetos UltrasonicSensor
 
-//--------------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------------
-// Función para serializar datos en un array de strings y enviarlos por Serial2
-void enviarDatosUART2(String datos[]) {
-  // Serializar los datos
-  String datosSerializados;
-  for (int i = 0; i < numSensors; i++) {
-    datosSerializados += datos[i];
-    datosSerializados += ","; 
-  }
-  // Enviar los datos serializados por Serial2
-  Serial2.println(datosSerializados);
-  Serial.println(datosSerializados);
-}//End void enviarDatos(String datos[])
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 void setup()
@@ -49,7 +35,7 @@ void loop()
   datos[4] = String(sensors[4].readDistance()); //cm
 
   //Se envian los datos por UART
-  enviarDatosUART2(datos);
+  enviarDatosUART2(datos, numSensors);
 }//End loop
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
