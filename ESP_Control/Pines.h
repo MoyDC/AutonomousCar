@@ -4,6 +4,7 @@
 //Sensor Lidar
   #define RX_LidarSensor 23
   #define TX_LidarSensor 19
+  SoftwareSerial mySerial_LidarSensor(RX_LidarSensor, TX_LidarSensor); // Crea una instancia de SoftwareSerial
 
 //UART0 - Serial
   #define RX0 3
@@ -18,8 +19,8 @@
   #define SCA 21
 
 //Servoomotor Volante
-  Servo ServoVolante;
   #define pinServoVolante 5
+  Servo ServoVolante;
 
 //Puente H - L298N 
   #define ENA 14

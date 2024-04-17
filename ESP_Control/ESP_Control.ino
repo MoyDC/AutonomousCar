@@ -1,6 +1,5 @@
 //ESP para realizar el control
 #include <TFMPlus.h>  // Include TFMini Plus Library v1.5.0
-TFMPlus tfmP;         // Create a TFMini Plus object
 #include <SoftwareSerial.h> 
 #include <Wire.h>              // libreria para bus I2C
 #include <Adafruit_GFX.h>      // libreria para pantallas graficas
@@ -30,9 +29,8 @@ void recibirDatosUART2(String datosSerializados, String datos[]) {
   }
 }//End void recibirDatosUART2(String datosSerializados, String datos[])
 //--------------------------------------------------------------------------------
-// Crea una instancia de SoftwareSerial
-SoftwareSerial mySerial_LidarSensor(RX_LidarSensor, TX_LidarSensor);
 //Funcion para iniciar el sensor lidar
+TFMPlus tfmP;  // Create a TFMini Plus object
 void initSensorLidar(void) {
   Serial.printf("\r\nTFMPlus Library Example\r\n");  // say 'hello'
 
