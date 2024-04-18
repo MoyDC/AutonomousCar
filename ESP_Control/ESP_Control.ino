@@ -45,7 +45,8 @@ void setup()
   mySerial_LidarSensor.begin(115200); // Inicializa el puerto UART
   initSensorLidar();
   
-  initLEDs();
+  initTimer1(LED1_FD, LED2_FI, LED3_AD, LED4_AI);
+  //initLEDs();
 
   pinMode(ENA, OUTPUT);
   pinMode(IN1, OUTPUT);
@@ -58,8 +59,17 @@ void setup()
 }
 void loop()
 {
-  //Leer datos del sensor lidar
-  tfmP.getData(tfDist, tfFlux, tfTemp);
+  //Reseteo de variables
+  tfDist = 0;
+  datos[0] = "0";
+  datos[1] = "0";
+  datos[2] = "0";
+  datos[3] = "0";
+  datos[4] = "0";
+
+  //Leer dato sensor lidar
+  tfDist = FiltroDatosSensorLidar();
+  //delay(5); //delay de lectura
 
   // Leer la cadena serializada
   String datosSerializados = Serial2.readStringUntil('\n');
@@ -73,7 +83,11 @@ void loop()
 
   if(Car.error(tfDist, datos)){
     Serial.println("Los sensores marcan valores menores al rango minimo");
-    contError = LEDsError(100, contError);
+    //contError = LEDsError(100, contError);
+    toggleTimer1(true);
+  }
+  else{
+    toggleTimer1(false);
   }
   // Esperar un momento
   //delay(100);
@@ -113,30 +127,36 @@ void loop()
 }
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
-
-void initLEDs(void){
-  pinMode(LED1_FD, OUTPUT);
-  pinMode(LED2_FI, OUTPUT);
-  pinMode(LED3_AD, OUTPUT);
-  pinMode(LED4_AI, OUTPUT);
-  digitalWrite(LED1_FD, LOW);
-  digitalWrite(LED2_FI, LOW);
-  digitalWrite(LED3_AD, LOW);
-  digitalWrite(LED4_AI, LOW);
+int FiltroDatosSensorLidar(void){
+  int datos[5];
+  for(int i=0; i<5; i++){
+    //Leer datos del sensor lidar
+    tfmP.getData(tfDist, tfFlux, tfTemp);
+    datos[i] = tfDist;
+    delay(5);
+  }
+  return calcularMediana(datos, 5);
 }
+// Función para calcular la mediana de un conjunto de datos enteros
+int calcularMediana(int datos[], int longitud) {
+  // Primero, ordenamos el conjunto de datos
+  for (int i = 0; i < longitud - 1; i++) {
+    for (int j = i + 1; j < longitud; j++) {
+      if (datos[i] > datos[j]) {
+        // Intercambiamos los valores si el elemento actual es mayor que el siguiente
+        int temp = datos[i];
+        datos[i] = datos[j];
+        datos[j] = temp;
+      }
+    }
+  }
 
-int LEDsError(int Delay, int contador){
-  if(contador >= Delay){
-    digitalWrite(LED1_FD, !digitalRead(LED1_FD));
-    digitalWrite(LED2_FI, !digitalRead(LED2_FI));
-    digitalWrite(LED3_AD, !digitalRead(LED3_AD));
-    digitalWrite(LED4_AI, !digitalRead(LED4_AI));
-    contador = 0;
+  // Calculamos la mediana
+  if (longitud % 2 == 0) {
+    // Si hay un número par de elementos, la mediana es el promedio de los dos valores centrales
+    return (datos[longitud / 2 - 1] + datos[longitud / 2]) / 2;
+  } else {
+    // Si hay un número impar de elementos, la mediana es el valor central
+    return datos[longitud / 2];
   }
-  else{
-    delay(1);
-    contador++;
-  }
-  Serial.println(contador);
-  return contador;
 }
