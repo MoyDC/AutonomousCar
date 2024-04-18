@@ -91,7 +91,7 @@ void loop()
   }
   // Esperar un momento
   //delay(100);
-  /*Serial.println("Servo 25");
+  Serial.println("Servo 25");
   ServoVolante.write(25);    // Mover el servo a 0 grados
   delay(1000);         // Esperar 1 segundo
   Serial.println("Servo 50");
@@ -105,7 +105,7 @@ void loop()
   delay(1000);         // Esperar 1 segundo
   //dsvdsvsvsds
 
-
+/*
   // Gira hacia adelante durante 2 segundos
   Serial.println("Girando hacia adelante");
   digitalWrite(IN1, HIGH);
