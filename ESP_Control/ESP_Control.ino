@@ -10,6 +10,7 @@
 #include "DatosUart2.h"
 #include "FuncionesOLED.h"
 #include "FuncionesSensorLidar.h"
+#include "DriveControlCar_Lib.h"
 
 //Variables 
 #define NUM_ELEMENTOS 5
@@ -17,6 +18,7 @@ String datos[NUM_ELEMENTOS];  //Array para los datos
 int16_t tfDist = 0;    // Distance to object in centimeters
 int16_t tfFlux = 0;    // Strength or quality of return signal
 int16_t tfTemp = 0;    // Internal temperature of Lidar sensor chip
+DriveControlCar Car;
 
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
@@ -57,9 +59,14 @@ void loop()
   Serial.println("Lidar: " + String(tfDist) + "cm, " + "UltraS1: " + datos[0] + "cm, " + "UltraS2: " + datos[1] + "cm, " + "UltraS3: " + datos[2] + "cm, " + "UltraS4: " + datos[3] + "cm, " + "UltraS5: " + datos[4] + "cm");
 
   DatosEquipo(tfDist, datos);
+
+  if(Car.error(tfDist, datos)){
+    Serial.println("Los sensores marcan valores menores al rango minimo");
+    
+  }
   // Esperar un momento
   //delay(100);
-  Serial.println("Servo 25");
+  /*Serial.println("Servo 25");
   ServoVolante.write(25);    // Mover el servo a 0 grados
   delay(1000);         // Esperar 1 segundo
   Serial.println("Servo 50");
@@ -91,7 +98,7 @@ void loop()
   // Se detiene durante 2 segundos
   Serial.println("Deteniendo motor");
   digitalWrite(ENA, LOW);
-  delay(1000);
+  delay(1000);*/
 }
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
