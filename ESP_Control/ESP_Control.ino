@@ -5,7 +5,7 @@
 #include <Adafruit_GFX.h>      // libreria para pantallas graficas
 #include <Adafruit_SSD1306.h>  // libreria para controlador SSD1306
 #include <ESP32Servo.h>
-#include "InterrupcionTimer0.h"
+#include "InterrupcionTimer.h"
 #include "Pines.h"
 #include "DatosUart2.h"
 #include "FuncionesOLED.h"
@@ -15,10 +15,12 @@
 //Variables 
 #define NUM_ELEMENTOS 5
 String datos[NUM_ELEMENTOS];  //Array para los datos
+DriveControlCar Car;
 int16_t tfDist = 0;    // Distance to object in centimeters
 int16_t tfFlux = 0;    // Strength or quality of return signal
 int16_t tfTemp = 0;    // Internal temperature of Lidar sensor chip
-DriveControlCar Car;
+int contError = 0;
+
 
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
@@ -28,6 +30,8 @@ void setup()
   initTimer0(LED_BUILTIN);
   Serial2.begin(9600);
   delay(20);
+
+
 
   ServoVolante.attach(pinServoVolante);
   ServoVolante.write(50);
@@ -41,9 +45,16 @@ void setup()
   mySerial_LidarSensor.begin(115200); // Inicializa el puerto UART
   initSensorLidar();
   
+  initLEDs();
+
   pinMode(ENA, OUTPUT);
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
+  digitalWrite(ENA, LOW);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+
+
 }
 void loop()
 {
@@ -62,7 +73,7 @@ void loop()
 
   if(Car.error(tfDist, datos)){
     Serial.println("Los sensores marcan valores menores al rango minimo");
-    
+    contError = LEDsError(100, contError);
   }
   // Esperar un momento
   //delay(100);
@@ -102,3 +113,30 @@ void loop()
 }
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
+
+void initLEDs(void){
+  pinMode(LED1_FD, OUTPUT);
+  pinMode(LED2_FI, OUTPUT);
+  pinMode(LED3_AD, OUTPUT);
+  pinMode(LED4_AI, OUTPUT);
+  digitalWrite(LED1_FD, LOW);
+  digitalWrite(LED2_FI, LOW);
+  digitalWrite(LED3_AD, LOW);
+  digitalWrite(LED4_AI, LOW);
+}
+
+int LEDsError(int Delay, int contador){
+  if(contador >= Delay){
+    digitalWrite(LED1_FD, !digitalRead(LED1_FD));
+    digitalWrite(LED2_FI, !digitalRead(LED2_FI));
+    digitalWrite(LED3_AD, !digitalRead(LED3_AD));
+    digitalWrite(LED4_AI, !digitalRead(LED4_AI));
+    contador = 0;
+  }
+  else{
+    delay(1);
+    contador++;
+  }
+  Serial.println(contador);
+  return contador;
+}
