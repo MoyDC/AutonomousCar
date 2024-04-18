@@ -16,6 +16,11 @@ void setup()
   initTimer0(LED_BUILTIN);
   Serial2.begin(9600);
 
+  Serial.println("Init...");
+  Serial.println("Init...");
+  Serial.println("Init...");
+  delay(1000);
+  
   // Inicializa cada objeto UltrasonicSensor con los pines correspondientes
   sensors[0].setPins(TRIG1, ECHO1);
   sensors[1].setPins(TRIG2, ECHO2);
@@ -28,14 +33,29 @@ void loop()
   // Array de strings
   String datos[numSensors]; //Array de los datos de los sensores
   //sensors[0].readDistance();
-  datos[0] = String(sensors[0].readDistance()); //cm
-  datos[1] = String(sensors[1].readDistance()); //cm
-  datos[2] = String(sensors[2].readDistance()); //cm
-  datos[3] = String(sensors[3].readDistance()); //cm
-  datos[4] = String(sensors[4].readDistance()); //cm
+  datos[0] = String(filtrarDatos(sensors[0])); //cm
+  datos[1] = String(filtrarDatos(sensors[1])); //cm
+  datos[2] = String(filtrarDatos(sensors[2])); //cm
+  datos[3] = String(filtrarDatos(sensors[3])); //cm
+  datos[4] = String(filtrarDatos(sensors[4])); //cm
 
   //Se envian los datos por UART
   enviarDatosUART2(datos, numSensors);
 }//End loop
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
+
+float filtrarDatos(UltrasonicSensor dato){
+  float datoFiltrado = 0;
+
+  //Serial.println(" ");
+  for(int i=0; i<5; i++){
+    float distancia = dato.readDistance();
+    datoFiltrado += distancia;
+    //Serial.println(String(i) + " - " + String(datoFiltrado) + " - " + String(distancia));
+    delay(5);
+  }
+  datoFiltrado /= 5;
+  //Serial.println(datoFiltrado);
+  return datoFiltrado;
+}

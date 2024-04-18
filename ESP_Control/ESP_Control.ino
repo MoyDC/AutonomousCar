@@ -59,12 +59,16 @@ void loop()
   DatosEquipo(tfDist, datos);
   // Esperar un momento
   //delay(100);
+  Serial.println("Servo 25");
   ServoVolante.write(25);    // Mover el servo a 0 grados
   delay(1000);         // Esperar 1 segundo
+  Serial.println("Servo 50");
   ServoVolante.write(50);   // Mover el servo a 90 grados
   delay(1000);         // Esperar 1 segundo
+  Serial.println("Servo 75");
   ServoVolante.write(75);  // Mover el servo a 180 grados
   delay(1000);
+  Serial.println("Servo 50");
   ServoVolante.write(50);   // Mover el servo a 90 grados
   delay(1000);         // Esperar 1 segundo
   //dsvdsvsvsds
