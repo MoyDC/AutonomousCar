@@ -49,6 +49,7 @@ void setup(){
   ServoVolante.attach(pinServoVolante);
   ServoVolante.write(ValMedioServo);
 
+
   Wire.begin(); // inicializa bus I2C
   Serial.println("OLED Init");
   oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // inicializa pantalla con direccion 0x3C
@@ -67,7 +68,9 @@ void setup(){
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, LOW);
 
-
+  /*while(1){
+    Serial.println("Nothing");
+  }*/
 }
 void loop(){
   //Reseteo de variables
@@ -77,13 +80,13 @@ void loop(){
   tfDist = FiltroDatosSensorLidar();
 
   // Imprimir los datos
-  Serial.println("Lidar: " + String(tfDist) + "cm, " + "UltraS1: " + datos[0] + "cm, " + "UltraS2: " + datos[1] + "cm, " + "UltraS3: " + datos[2] + "cm, " + "UltraS4: " + datos[3] + "cm, " + "UltraS5: " + datos[4] + "cm");
+  Serial.println("Lidar: " + String(tfDist) + "cm, " + "UltraS0: " + datos[0] + "cm, " + "UltraS1: " + datos[1] + "cm, " + "UltraS2: " + datos[2] + "cm, " + "UltraS3: " + datos[3] + "cm, " + "UltraS4: " + datos[4] + "cm");
   
   //Mostrar informacion en el OLED
   DatosEquipo(tfDist, datos);
   
-  
-  if(Car.error(tfDist, datos)){
+  Car.ReadData(tfDist, datos);
+  if(Car.error()){
     Serial.println("Los sensores marcan valores menores al rango minimo");
 
     //Se detiene los motores
@@ -94,14 +97,83 @@ void loop(){
     //Apagar y prender los leds
     toggleTimer1(true, true, true, true, true);
   }
+  else if(Car.Forward()){
+    Serial.println("Carro Forward");
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+    digitalWrite(ENA, HIGH);
+
+    if(Car.TurnRight() == Car.TurnLeft()){
+      Serial.println("Quiere girar a la izquierda y a la derecha a la vez");
+      Serial.print("S1: ");
+      Serial.print(datos[0]);
+      Serial.print(" - S2: ");
+      Serial.println(datos[1]);
+
+      float valAsbTurnRight = abs(1 - Car.get_factorTurnRight());
+      float valAsbTurnLeft = abs(1 - Car.get_factorTurnLeft());
+
+      Serial.print("Factor 1: ");
+      Serial.print(valAsbTurnRight);
+      Serial.print(" - Factor 2: ");
+      Serial.println(valAsbTurnLeft);
+
+      if(valAsbTurnRight == valAsbTurnLeft){
+        //No nada
+        Serial.println("No girar");
+        ServoVolante.write(ValMedioServo);
+        toggleTimer1(false);
+      }
+      else if(valAsbTurnRight >= valAsbTurnLeft){
+        //Gira a la derecha
+        Serial.println("Gira a la derecha");
+        ServoVolante.write(ValMedioServo*Car.get_factorTurnRight());
+        toggleTimer1(true, true, false);
+      }
+      else if(valAsbTurnRight < valAsbTurnLeft){
+        //Gira a la izquierda
+        Serial.println("Gira a la izquierda");
+        ServoVolante.write(ValMedioServo*Car.get_factorTurnLeft());
+        toggleTimer1(true, false, true);
+      }
+      
+    }
+    else if(Car.TurnRight()){
+      Serial.println("Carro Turn Right");
+      ServoVolante.write(ValMedioServo*Car.get_factorTurnRight());
+      toggleTimer1(true, true, false);
+      /*Serial.print("S2: ");
+      Serial.print(datos[1]);
+      Serial.print(" - Servo Turn Right: ");
+      Serial.println(Car.get_factorTurnRight());*/
+    }
+    else if(Car.TurnLeft()){
+      Serial.println("Carro Turn Right");
+      ServoVolante.write(ValMedioServo*Car.get_factorTurnLeft());
+      toggleTimer1(true, false, true);
+      /*Serial.print("S1: ");
+      Serial.print(datos[0]);
+      Serial.print(" - Servo Turn Left: ");
+      Serial.println(Car.get_factorTurnLeft());*/
+    }
+    else{
+      Serial.println("No hace nada");
+      ServoVolante.write(ValMedioServo);
+      toggleTimer1(false);
+    }
+  }
   else{
-    toggleTimer1(false);
+    Serial.println("Carro Stop");
+    toggleTimer1(true, true, true, true, true);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
+    digitalWrite(ENA, LOW);
   }
 
 
   /*
     ************TEST SERVOMOTOR************
-  */
+  
 
   for (int angulo = ValMaximoServo; angulo >= ValMinimoServo; angulo--) {
     toggleTimer1(true, false, true);
@@ -121,6 +193,7 @@ void loop(){
   toggleTimer1(false);
   delay(1000);  // Espera antes de reiniciar el ciclo
   
+  */
 
   //delay(5); //delay de lectura
   // Esperar un momento
