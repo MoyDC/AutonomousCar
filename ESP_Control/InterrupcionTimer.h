@@ -9,6 +9,10 @@ int LedToggleTimer1_LED1;
 int LedToggleTimer1_LED2;
 int LedToggleTimer1_LED3;
 int LedToggleTimer1_LED4;
+bool activarTimer1_LED1;
+bool activarTimer1_LED2;
+bool activarTimer1_LED3;
+bool activarTimer1_LED4;
 hw_timer_t *Timer1_Cfg = NULL; // Agregamos el puntero para el Timer 1
 #define INTERVALO_LED_1 100 // Definimos un nuevo intervalo para el Timer 1
 volatile int ContEstadoLed1 = 0; // Contador para el Timer 1
@@ -26,10 +30,14 @@ void IRAM_ATTR Timer0_ISR() {
 
 void IRAM_ATTR Timer1_ISR() {
   if (ContEstadoLed1 >= INTERVALO_LED_1) {
-    digitalWrite(LedToggleTimer1_LED1, !digitalRead(LedToggleTimer1_LED1));
-    digitalWrite(LedToggleTimer1_LED2, !digitalRead(LedToggleTimer1_LED2));
-    digitalWrite(LedToggleTimer1_LED3, !digitalRead(LedToggleTimer1_LED3));
-    digitalWrite(LedToggleTimer1_LED4, !digitalRead(LedToggleTimer1_LED4));
+    if(activarTimer1_LED1){digitalWrite(LedToggleTimer1_LED1, !digitalRead(LedToggleTimer1_LED1));}
+    else{digitalWrite(LedToggleTimer1_LED1, LOW);}
+    if(activarTimer1_LED2){digitalWrite(LedToggleTimer1_LED2, !digitalRead(LedToggleTimer1_LED2));}
+    else{digitalWrite(LedToggleTimer1_LED2, LOW);}
+    if(activarTimer1_LED3){digitalWrite(LedToggleTimer1_LED3, !digitalRead(LedToggleTimer1_LED3));}
+    else{digitalWrite(LedToggleTimer1_LED3, LOW);}
+    if(activarTimer1_LED4){digitalWrite(LedToggleTimer1_LED4, !digitalRead(LedToggleTimer1_LED4));}
+    else{digitalWrite(LedToggleTimer1_LED4, LOW);}
     ContEstadoLed1 = 0;
   } else {
     ContEstadoLed1++;
@@ -63,10 +71,14 @@ void initTimer1(int PinLed1, int PinLed2, int PinLed3, int PinLed4) {
 }
 
 // Función para activar o desactivar el Timer 1
-void toggleTimer1(bool activate) {
+void toggleTimer1(bool activate, bool Led1 = false, bool Led2 = false, bool Led3 = false, bool Led4 = false) {
   if (activate) {
     // Activar el Timer 1
     timerAlarmEnable(Timer1_Cfg);
+    activarTimer1_LED1 = Led1; 
+    activarTimer1_LED2 = Led2; 
+    activarTimer1_LED3 = Led3; 
+    activarTimer1_LED4 = Led4; 
   } else {
     // Desactivar el Timer 1
     timerAlarmDisable(Timer1_Cfg);

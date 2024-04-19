@@ -22,6 +22,7 @@ int16_t tfDist = 0;    // Distance to object in centimeters
 int16_t tfFlux = 0;    // Strength or quality of return signal
 int16_t tfTemp = 0;    // Internal temperature of Lidar sensor chip
 int contError = 0;
+int ValMedioServo = 50;
 
 
 //--------------------------------------------------------------------------------
@@ -44,7 +45,7 @@ void setup(){
   );
 
   ServoVolante.attach(pinServoVolante);
-  ServoVolante.write(50);
+  ServoVolante.write(ValMedioServo);
 
   Wire.begin(); // inicializa bus I2C
   Serial.println("OLED Init");
@@ -86,9 +87,10 @@ void loop(){
     //Se detiene los motores
 
     //Se detiene el servomotor
+    ServoVolante.write(ValMedioServo);
 
     //Apagar y prender los leds
-    toggleTimer1(true);
+    toggleTimer1(true, true, true, true, true);
   }
   else{
     toggleTimer1(false);
@@ -100,13 +102,13 @@ void loop(){
   ServoVolante.write(25);    // Mover el servo a 0 grados
   delay(1000);         // Esperar 1 segundo
   Serial.println("Servo 50");
-  ServoVolante.write(50);   // Mover el servo a 90 grados
+  ServoVolante.write(ValMedioServo);   // Mover el servo a 90 grados
   delay(1000);         // Esperar 1 segundo
   Serial.println("Servo 75");
   ServoVolante.write(75);  // Mover el servo a 180 grados
   delay(1000);
   Serial.println("Servo 50");
-  ServoVolante.write(50);   // Mover el servo a 90 grados
+  ServoVolante.write(ValMedioServo);   // Mover el servo a 90 grados
   delay(1000);         // Esperar 1 segundo
   //dsvdsvsvsds
 
