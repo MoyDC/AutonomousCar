@@ -12,7 +12,9 @@
 #include "FuncionesSensorLidar.h"
 #include "DriveControlCar_Lib.h"
 
+
 //Variables 
+TaskHandle_t taskCore0; //Core 0 - Nucleo 0
 #define NUM_ELEMENTOS 5
 String datos[NUM_ELEMENTOS];  //Array para los datos
 DriveControlCar Car;
@@ -24,14 +26,22 @@ int contError = 0;
 
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
-void setup()
-{
+void setup(){
   Serial.begin(115200);
   initTimer0(LED_BUILTIN);
   Serial2.begin(9600);
   delay(20);
 
-
+  //Core 0 - Nucleo 0
+  xTaskCreatePinnedToCore(
+    Loop2,   //Nombre del loop creado
+    "Loop2",     //Nombre
+    10000,        //Tama;o de la pila
+    NULL,         //Parametro casi siempre Nulo
+    1,            //Prioridad de la tarea
+    &taskCore0,   //Nombre de la tarea
+    0             //Nucleo donde se ejecutara
+  );
 
   ServoVolante.attach(pinServoVolante);
   ServoVolante.write(50);
@@ -46,7 +56,6 @@ void setup()
   initSensorLidar();
   
   initTimer1(LED1_FD, LED2_FI, LED3_AD, LED4_AI);
-  //initLEDs();
 
   pinMode(ENA, OUTPUT);
   pinMode(IN1, OUTPUT);
@@ -57,41 +66,37 @@ void setup()
 
 
 }
-void loop()
-{
+void loop(){
   //Reseteo de variables
   tfDist = 0;
-  datos[0] = "0";
-  datos[1] = "0";
-  datos[2] = "0";
-  datos[3] = "0";
-  datos[4] = "0";
 
-  //Leer dato sensor lidar
+  //Se leen los datos del sensor Lidar
   tfDist = FiltroDatosSensorLidar();
-  //delay(5); //delay de lectura
-
-  // Leer la cadena serializada
-  String datosSerializados = Serial2.readStringUntil('\n');
-  //Obtener los datos
-  recibirDatosUART2(datosSerializados, datos, NUM_ELEMENTOS);
 
   // Imprimir los datos
   Serial.println("Lidar: " + String(tfDist) + "cm, " + "UltraS1: " + datos[0] + "cm, " + "UltraS2: " + datos[1] + "cm, " + "UltraS3: " + datos[2] + "cm, " + "UltraS4: " + datos[3] + "cm, " + "UltraS5: " + datos[4] + "cm");
-
+  
+  //Mostrar informacion en el OLED
   DatosEquipo(tfDist, datos);
-
+  
+  
   if(Car.error(tfDist, datos)){
     Serial.println("Los sensores marcan valores menores al rango minimo");
-    //contError = LEDsError(100, contError);
+
+    //Se detiene los motores
+
+    //Se detiene el servomotor
+
+    //Apagar y prender los leds
     toggleTimer1(true);
   }
   else{
     toggleTimer1(false);
   }
+  //delay(5); //delay de lectura
   // Esperar un momento
   //delay(100);
-  Serial.println("Servo 25");
+  /*Serial.println("Servo 25");
   ServoVolante.write(25);    // Mover el servo a 0 grados
   delay(1000);         // Esperar 1 segundo
   Serial.println("Servo 50");
@@ -105,7 +110,7 @@ void loop()
   delay(1000);         // Esperar 1 segundo
   //dsvdsvsvsds
 
-/*
+
   // Gira hacia adelante durante 2 segundos
   Serial.println("Girando hacia adelante");
   digitalWrite(IN1, HIGH);
@@ -124,7 +129,21 @@ void loop()
   Serial.println("Deteniendo motor");
   digitalWrite(ENA, LOW);
   delay(1000);*/
-}
+}//End loop
+void Loop2(void *parameter){//Core 0 - Nucleo 0
+  while(true){
+    //Serial.println(" ");
+    if(Serial2.available()){
+      // Leer la cadena serializada
+      String datosSerializados = Serial2.readStringUntil('\n');
+      //Obtener los datos
+      recibirDatosUART2(datosSerializados, datos, NUM_ELEMENTOS);
+    }
+    delay(20);
+  }//End while(true)
+  vTaskDelay(10); //Eviar advertencia de watchdog
+}//Fin Loop2(void *parameter)
+
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 int FiltroDatosSensorLidar(void){
@@ -133,10 +152,11 @@ int FiltroDatosSensorLidar(void){
     //Leer datos del sensor lidar
     tfmP.getData(tfDist, tfFlux, tfTemp);
     datos[i] = tfDist;
-    delay(5);
+    delay(10);
   }
   return calcularMediana(datos, 5);
-}
+}//End int FiltroDatosSensorLidar(void)
+
 // Función para calcular la mediana de un conjunto de datos enteros
 int calcularMediana(int datos[], int longitud) {
   // Primero, ordenamos el conjunto de datos
@@ -150,7 +170,6 @@ int calcularMediana(int datos[], int longitud) {
       }
     }
   }
-
   // Calculamos la mediana
   if (longitud % 2 == 0) {
     // Si hay un número par de elementos, la mediana es el promedio de los dos valores centrales
@@ -159,4 +178,4 @@ int calcularMediana(int datos[], int longitud) {
     // Si hay un número impar de elementos, la mediana es el valor central
     return datos[longitud / 2];
   }
-}
+}//End int calcularMediana(int datos[], int longitud)
