@@ -3,6 +3,8 @@ class UltrasonicSensor {
   private:
     int triggerPin;
     int echoPin;
+    unsigned long distanceParametro;
+    unsigned long tiempoAuxParametro;
 
   public:
     // Constructor
@@ -15,6 +17,22 @@ class UltrasonicSensor {
       pinMode(triggerPin, OUTPUT);
       pinMode(echoPin, INPUT);
     }
+    // Método para establecer los pines del sensor
+    void setParametros(int distance = 1000, int tiempoAux = 1000000) {
+      distanceParametro = distance;
+      tiempoAuxParametro = tiempoAux;
+    }
+
+    //Metodo para obtener distanceParametro
+    int get_distanceParametro(){
+      return distanceParametro;
+    }
+
+    //Metodo para obtener tiempoAuxParametro
+    int get_tiempoAuxParametro(){
+      return tiempoAuxParametro;
+    }
+
 
     // Método para leer la distancia
     float readDistance() {
@@ -27,11 +45,14 @@ class UltrasonicSensor {
       //Serial.println(triggerPin);
       //Serial.println(echoPin);
       // Lee la duración del eco del pin de eco
-      float duration = pulseIn(echoPin, HIGH);
+      float duration = pulseIn(echoPin, HIGH, tiempoAuxParametro); //tiempoAux por si quieres cambiar este parametro
       //Serial.println(duration);
       // Calcula la distancia en función de la duración del eco
       float distance = duration / 58.2; // Dividido por 2 porque el sonido viaja de ida y vuelta
       //Serial.println(distance);
+      if(duration == 0){
+        return distance = distanceParametro;
+      }
       return distance;
     }
 };//End class UltrasonicSensor
