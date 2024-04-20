@@ -103,7 +103,19 @@ void loop(){
     digitalWrite(IN2, LOW);
     digitalWrite(ENA, HIGH);
 
-    if(Car.TurnRight() == Car.TurnLeft()){
+    Serial.print("Right: ");
+    Serial.print(Car.TurnRight());
+    Serial.print(" - Left: ");
+    Serial.println(Car.TurnLeft());
+
+    bool coontinuar = true;
+    if(Car.get_limiteForwardActual() >= 30 && Car.Get_Data2() >= 7 && Car.Get_Data3() >= 7){
+      Serial.println("Todo bien - seguir hacia adelante");
+      ServoVolante.write(ValMedioServo);
+      toggleTimer1(false);
+    }
+
+    else if(Car.TurnRight() == Car.TurnLeft()){
       Serial.println("Quiere girar a la izquierda y a la derecha a la vez");
       Serial.print("S1: ");
       Serial.print(datos[0]);
@@ -113,9 +125,13 @@ void loop(){
       float valAsbTurnRight = abs(1 - Car.get_factorTurnRight());
       float valAsbTurnLeft = abs(1 - Car.get_factorTurnLeft());
 
-      Serial.print("Factor 1: ");
+      Serial.print("FactorRight: ");
+      Serial.print(Car.get_factorTurnRight());
+      Serial.print(" - FactorLeft: ");
+      Serial.println(Car.get_factorTurnLeft());
+      Serial.print("FactorRightAbs: ");
       Serial.print(valAsbTurnRight);
-      Serial.print(" - Factor 2: ");
+      Serial.print(" - FactorLeftAbs: ");
       Serial.println(valAsbTurnLeft);
 
       if(valAsbTurnRight == valAsbTurnLeft){
@@ -142,33 +158,34 @@ void loop(){
       Serial.println("Carro Turn Right");
       ServoVolante.write(ValMedioServo*Car.get_factorTurnRight());
       toggleTimer1(true, true, false);
-      /*Serial.print("S2: ");
+      Serial.print("S1: ");
       Serial.print(datos[1]);
       Serial.print(" - Servo Turn Right: ");
-      Serial.println(Car.get_factorTurnRight());*/
+      Serial.println(Car.get_factorTurnRight());
     }
     else if(Car.TurnLeft()){
-      Serial.println("Carro Turn Right");
+      Serial.println("Carro Turn Left");
       ServoVolante.write(ValMedioServo*Car.get_factorTurnLeft());
       toggleTimer1(true, false, true);
-      /*Serial.print("S1: ");
+      Serial.print("S0: ");
       Serial.print(datos[0]);
       Serial.print(" - Servo Turn Left: ");
-      Serial.println(Car.get_factorTurnLeft());*/
+      Serial.println(Car.get_factorTurnLeft());
     }
     else{
       Serial.println("No hace nada");
       ServoVolante.write(ValMedioServo);
       toggleTimer1(false);
     }
-  }
+    
+  }//End else if(Car.Forward())
   else{
     Serial.println("Carro Stop");
     toggleTimer1(true, true, true, true, true);
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, LOW);
     digitalWrite(ENA, LOW);
-  }
+  }//End else
 
 
   /*

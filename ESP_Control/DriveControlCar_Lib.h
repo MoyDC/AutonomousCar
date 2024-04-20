@@ -30,6 +30,21 @@ class DriveControlCar {
       dato3 = datos[3].toInt();
       dato4 = datos[4].toInt();
     }
+    int Get_Data0(void){
+      return dato0;
+    }
+    int Get_Data1(void){
+      return dato1;
+    }
+    int Get_Data2(void){
+      return dato2;
+    }
+    int Get_Data3(void){
+      return dato3;
+    }
+    int Get_Data4(void){
+      return dato4;
+    }
 
     // Método para saber si hay error
     bool error() {
@@ -64,7 +79,7 @@ class DriveControlCar {
     }
 
     //Metodo para obtener limiteForward
-    int get_limiteForward(){
+    int get_limiteForwardActual(){
       return limiteForwardActual;
     }
 
@@ -106,33 +121,10 @@ class DriveControlCar {
         return true;
       }
       else{
-        return false;
-      }
-    }//End bool TurnRight(void)
-
-    //Metodo para girar hacia la derecha con ayuda de otro dato/sensor
-    float Aux_TurnRight(void){
-      int limiteForward1 = 45;
-      int limiteForward2 = 35;
-      int limiteForward3 = 25;
-
-      if(dato3>=limiteForward1){
-        return 0;
-      }
-      else if(dato3>=limiteForward2){
-        return 0.2;
-      }
-      else if(dato3>=limiteForward3){
-        factorTurnRight = 0.3;
+        factorTurnRight = 2;
         return true;
       }
-      else if(dato3>=limiteMinError){
-        return 0.4;
-      }
-      else{
-        return 0.4;
-      }
-    }//End int Aux_TurnRight(void)
+    }//End bool TurnRight(void)
 
     //Metodo para obtener factorTurnRight
     float get_factorTurnRight(void){
@@ -184,7 +176,8 @@ class DriveControlCar {
         return true;
       }
       else{
-        return false;
+        factorTurnLeft = 0;
+        return true;
       }
     }//End bool TurnLeft(void)
 
