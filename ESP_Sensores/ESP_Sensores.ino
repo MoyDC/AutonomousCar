@@ -72,7 +72,7 @@ void IRAM_ATTR interruptionSensor3(){
     sensors[3].CalculateDistance();
   }
 }//End void IRAM_ATTR interruptionSensor3()
-void IRAM_ATTR interruptionSensor4(){
+/*void IRAM_ATTR interruptionSensor4(){
   //Serial.println("Entre a la interrupcion");
   if(sensors[4].GetInterrupcionEstado() == false){ //Primer cambio Low a High 
     //Serial.println("Interrupcion Cambio 1");
@@ -89,7 +89,7 @@ void IRAM_ATTR interruptionSensor4(){
     sensors[4].CalculateDistance();// = duration / 58.2; // Dividido por 2 porque el sonido viaja de ida y vuelta
     //Serial.println(duration5);
   }
-}//End void IRAM_ATTR interruptionSensor4()
+}//End void IRAM_ATTR interruptionSensor4()*/
 //-----------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ void setup()
   sensors[1].SetPines(TRIG2, ECHO2, interruptionSensor1);
   sensors[2].SetPines(TRIG3, ECHO3, interruptionSensor2);
   sensors[3].SetPines(TRIG4, ECHO4, interruptionSensor3);
-  sensors[4].SetPines(TRIG5, ECHO5, interruptionSensor4);
+  //sensors[4].SetPines(TRIG5, ECHO5, interruptionSensor4);
 
   /*sensors[0].setParametros(50, 5000);
   sensors[1].setParametros(50, 5000);
@@ -142,27 +142,27 @@ int* leerDatos(int NumDatos){
   int Sensor2[NumDatos];
   int Sensor3[NumDatos];
   int Sensor4[NumDatos];
-  int Sensor5[NumDatos];
+  //int Sensor5[NumDatos];
 
   for(int i=0; i<NumDatos; i++){
     sensors[0].Activar_Sensor(4);
     sensors[1].Activar_Sensor(4);
     sensors[2].Activar_Sensor(4);
     sensors[3].Activar_Sensor(4);
-    sensors[4].Activar_Sensor(4);
+    //sensors[4].Activar_Sensor(4);
     //delay(10);//Delay para poder obtener la señal 
     Sensor1[i] = sensors[0].GetDistance();
     Sensor2[i] = sensors[1].GetDistance();
     Sensor3[i] = sensors[2].GetDistance();
     Sensor4[i] = sensors[3].GetDistance();
-    Sensor5[i] = sensors[4].GetDistance();
+    //Sensor5[i] = sensors[4].GetDistance();
   }
 
   DatoFiltrado[0] = filtrarDato_Promedio(Sensor1, NumDatos);
   DatoFiltrado[1] = filtrarDato_Promedio(Sensor2, NumDatos);
   DatoFiltrado[2] = filtrarDato_Promedio(Sensor3, NumDatos);
   DatoFiltrado[3] = filtrarDato_Promedio(Sensor4, NumDatos);
-  DatoFiltrado[4] = filtrarDato_Promedio(Sensor5, NumDatos);
+  DatoFiltrado[4] = 0; //filtrarDato_Promedio(Sensor5, NumDatos);
 
   return DatoFiltrado;
 }
